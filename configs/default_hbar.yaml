@@ -1,0 +1,10 @@
+apparatus: hbar
+gap_merge_sec: 0.8
+pad_pre_sec: 0.1
+pad_post_sec: 0.1
+cfr_fps: 30
+motion:
+  diff_threshold: 20
+  score_threshold: 18.0
+  smooth_window: 5
+  min_active_sec: 0.6
