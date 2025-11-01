@@ -21,7 +21,24 @@ def compute_motion_scores(path: str, roi: tuple[int,int,int,int], diff_thr: int 
     if not cap.isOpened():
         raise FileNotFoundError(f"cannot open video: {path}")
     fps = cap.get(cv2.CAP_PROP_FPS) or 30.0
+    frame_w = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH) or 0)
+    frame_h = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT) or 0)
+    if frame_w <= 0 or frame_h <= 0:
+        ok, probe_frame = cap.read()
+        if not ok:
+            cap.release()
+            return ([], float(fps))
+        frame_h, frame_w = probe_frame.shape[:2]
     cap.release()
+
+    x, y, w, h = roi
+    if x < 0 or y < 0:
+        raise ValueError("ROI x/y must be within the frame (>=0)")
+    if frame_w > 0 and frame_h > 0:
+        if x + w > frame_w or y + h > frame_h:
+            raise ValueError(
+                f"ROI {roi} exceeds frame size ({frame_w}x{frame_h})."
+            )
 
     prev = None
     scores: List[float] = []
